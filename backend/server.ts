@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import { GetRoomsAction, JoinAction, CreateRoomAction, Action } from './Action';
+import { GetRoomsAction, JoinAction, CreateRoomAction, Action, StartRoundAction, getAnswerAction } from './Action';
 import { RoomData } from './RoomData';
 
 // Create the WebSocket server
@@ -23,27 +23,32 @@ wss.on('connection', (socket: WebSocket) => {
     try {
       // Convert Buffer to string if necessary
       const parsedMessage = JSON.parse(message);
-      const { action, roomId } = parsedMessage;
-      
+      const { action, roomId } = parsedMessage; 
       let actionInstance: Action | null = null;
 
       switch (action) {
-        case 'findall':
-          actionInstance = new GetRoomsAction();
-          break;
-        case 'join':
-          actionInstance = new JoinAction();
-          break;
-        case 'create':
-          actionInstance = new CreateRoomAction();
-          break;
+        case 'getRoom':
+            actionInstance = new GetRoomsAction();
+            break;
+        case 'joinRoom':
+            actionInstance = new JoinAction();
+            break;
+        case 'createRoom':
+            actionInstance = new CreateRoomAction();
+            break;
+        case 'getAnswer':
+            actionInstance = new getAnswerAction();
+            break;
+        case 'startRound':
+            actionInstance = new StartRoundAction();
+            break;
+
         default:
           console.log('Unknown action');
-          socket.send(JSON.stringify({ message: 'Unknown action' }));
+          socket.send(JSON.stringify({ message: 'Unknown action', action : "invalid" }));
           return;
       }
 
-      // Execute the appropriate action
       if (actionInstance) {
         actionInstance.execute(roomId, socket, state);
       }
