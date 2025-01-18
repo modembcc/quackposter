@@ -3,7 +3,9 @@ require('dotenv')
 export type Response = {
   ok: boolean;
   msg: string;
+  action: string;
 };  
+
 
 
 const animals = ['Lion', 'Elephant', 'Tiger', 'Giraffe', 'Zebra', 'Kangaroo', 'Panda', 'Koala', 'Bear', 'Monkey', 
@@ -15,50 +17,57 @@ function generateRandomElem(arr: Object[]): any{
 }
 
 export class RoomData {
-  private players: Map<WebSocket, string>;
+  private players: WebSocket[];
   private round:number = 0
   private size:number = 0
   private started: boolean = false;
   private majorityWord: string = generateRandomElem(Object.keys(animals));
   private minorityWord: string = generateRandomElem(Object.keys(animals));
-  private minorityPlayer: WebSocket | null = null;
-  private answers: string[] = []; // same for all users
+  private minorityIndex: number = Math.floor(Math.random() * 3)
+  private answers:string[] = ["","","",""]
   private questions: string[] = [];// same for all answers
+  private index: Record<WebSocket, number> = {}
+  private votes: number[] = [0,0,0,0]
   
   // add the one calling the data
   constructor(creator: WebSocket){
-    this.players.set(creator, "")
+    this.players.push({id: creator, answer : ""})
+    this.index[creator] = 0;
+    this.size+=1
     while (this.majorityWord === this.minorityWord) {
       this.minorityWord = generateRandomElem(animals)
     }
- 
   }
 
   setUpRoom() {
-    this.minorityPlayer = generateRandomElem(Object.keys(this.players));
-    for (let key of this.players.keys()){
-      if (key === this.minorityPlayer){
-        this.players.set(key, this.minorityWord)
+    this.players.forEach((val, index) => {
+      if (index === this.minorityIndex){
+        val.send(this.minorityWord)
       } else {
-        this.players.set(key, this.majorityWord)
+        val.send(this.majorityWord)
       }
+    })
   }
 
-  }
+  
   // Add player (WebSocket client) to the room
   add(socket: WebSocket): Response {
-    if (this.isFull()){
-      return {ok: false, msg: "Room is Full"}
+    if (this.isFull()) {
+      return {ok: false, msg: "Room is Full", action: "joinRoom"}
     }
-    this.size+=1
-    this.players.set(socket, "");
-    if (this.size === 4){
+    this.players.push(socket);
+    this.index[socket] = this.size;
+    this.size+=1;
+    if (this.size === 4) {
       this.started = true
-      this.setUpRoom
+      this.setUpRoom()
     }
-    return {ok : true, msg : "Joined Successfully"}
+    return {ok : true, msg : "Joined Successfully", action: "joinRoom"}
   }
 
+  updateAnswer(socket: WebSocket, msg: string){
+    this.answers[this.index[socket]] = msg;
+  }
 
   
   async generateQuestions(){
@@ -106,11 +115,28 @@ export class RoomData {
   this.questions = JSON.parse(questions).questions
 }
 
+  getQuestion(): string{
+    const res:string = this.questions[this.round]
+    this.round+=1
+    return res
+  }
+
+  getAnswer(): string[]{
+    return this.answers;
+  }
+
   isFull() {
     return this.started
   }
 
-  // Broadcast message to all players in the room
+  isFirstRound(){
+    return this.round === 0
+  } 
+
+  isLastRound(){
+    return this.round === 2
+  } 
+   // Broadcast message to all players in the room
   // private static broadcastMsg(msg: Record<string,boolean>): void {
   //   this.players.forEach((client) => {
   //     if (client.readyState === WebSocket.OPEN) {
@@ -122,6 +148,18 @@ export class RoomData {
     return this.size
   }
 
+
+  updateVote(index:number): void {
+     this.votes[index]+=1
+  }
+
+  // getVoteResult(): void {
+  //   let maxnumber: number = -1
+  //   let maxindex:number[] = []
+  //   for (let i = 0; i < 4; i++){
+       
+  //   }
+  // }
 
 
 }
