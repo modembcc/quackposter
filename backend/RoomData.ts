@@ -1,5 +1,8 @@
 import WebSocket from "ws";
-require("dotenv");
+import dotenv from "dotenv";
+
+dotenv.config();
+
 export type Response = {
   ok: boolean;
   msg: string;
@@ -34,7 +37,7 @@ function generateRandomElem(arr: Object[]): any {
 }
 
 export class RoomData {
-  private players: Map<WebSocket, string>;
+  private players: Map<WebSocket, string> = new Map();
   private round: number = 0;
   private size: number = 0;
   private started: boolean = false;
