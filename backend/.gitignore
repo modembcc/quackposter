@@ -1,0 +1,27 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React build
+build/
+dist/
+
+# dotenv environment variables file
+.env
+
+# VSCode settings
+.vscode/
+
+# MacOS system files
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Dependencies for frontend
+frontend/node_modules/
+
+# Test results
+coverage/
