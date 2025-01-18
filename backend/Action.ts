@@ -30,6 +30,44 @@ export class CreateRoomAction implements Action {
       randomInRange = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
     }
     state[randomInRange] = new RoomData(socket);
-    socket.send(JSON.stringify({ ok: true, msg: `Room ${randomInRange} created successfully` }));
+    socket.send(JSON.stringify({ ok: true, msg: `Room ${randomInRange} created successfully`, action: "createRoom" }));
   }
 }
+
+export class StartRoundAction implements Action {
+  execute(id:number, socket: WebSocket, state: { [key: number]: RoomData }): void {
+    const room:RoomData = state[id]
+    socket.send(JSON.stringify({ ok: true, isLastRound: room.isLastRound(), question:room.getQuestion(), action: "startRound" }));
+  }
+}
+
+export class getAnswerAction implements Action {
+  execute(id:number, socket: WebSocket, state: { [key: number]: RoomData }): void {
+    const room:RoomData = state[id]
+    socket.send(JSON.stringify({ ok: true, answers: room.getAnswer(), action: "getAnswer"}));
+  }
+}
+
+
+export interface MessageAction {
+  execute(id : number, msg: string | null, socket: WebSocket, state: { [key: number]: RoomData }): void;
+}
+
+export class updateAnswerAction implements MessageAction {
+  execute(id: number, msg:string, socket: WebSocket, state: { [key: number]: RoomData }): void {
+    const room:RoomData = state[id]
+    room.updateAnswer(socket, msg)
+  }
+}
+
+
+// export interface IndexAction {
+//   execute(id : number, playerIndex: number, socket: WebSocket, state: { [key: number]: RoomData }): void;
+// }
+
+// export class voteAction implements IndexAction {
+//   execute(id: number, playerIndex:number, socket: WebSocket, state: { [key: number]: RoomData }): void {
+//     const room:RoomData = state[id]
+//     room.updateVote(playerIndex)
+//   }
+// }
