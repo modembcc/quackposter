@@ -18,9 +18,12 @@ export class GetRoomsAction implements Action {
   ): void {
     socket.send(
       JSON.stringify(
-        Object.keys(state)
-          .filter((x) => !state[x].isFull())
-          .map((x) => ({ id: x, members: state[x].getSize() }))
+        {
+          data : Object.keys(state)
+            .filter((x) => !state[x].isFull())
+            .map((x) => ({ id: x, members: state[x].getSize() })),
+          action : "getRooms"
+        }
       )
     );
   }
