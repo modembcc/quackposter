@@ -8,6 +8,9 @@ import {
   getAnswerAction,
   UpdateAnswerAction,
   MessageAction,
+  IndexAction,
+  VoteAction,
+  GetVoteAction
 } from "./Action.js";
 import { RoomData } from "./RoomData.js";
 
@@ -22,11 +25,7 @@ interface ServerState {
 
 const state: ServerState = {}; // stores rooms and associated sockets
 
-// Define the message type
-interface WebSocketMessage {
-  action: "findall" | "join" | "create";
-  roomId: string;
-}
+
 
 wss.on("connection", (socket: WebSocket) => {
   console.log("connection created");
@@ -37,10 +36,10 @@ wss.on("connection", (socket: WebSocket) => {
     try {
       // Parse the incoming message
       const parsedMessage = JSON.parse(message);
-      const { action, roomId, msg } = parsedMessage;
+      const { action, roomId, msg, playerIndex } = parsedMessage;
       let actionInstance: Action | null = null;
       let messageActionInstance: MessageAction | null = null;
-
+      let indexActionInstance: IndexAction | null = null
 
       // Handle different actions
       switch (action) {
@@ -62,6 +61,13 @@ wss.on("connection", (socket: WebSocket) => {
         case "updateAnswer":
           messageActionInstance = new UpdateAnswerAction()
           break;
+        case "updateVotes":
+          indexActionInstance = new VoteAction()
+          break;
+        case "getVotes":
+          actionInstance = new GetVoteAction();
+          break;
+
 
         default:
           console.log("Unknown action");
@@ -76,6 +82,9 @@ wss.on("connection", (socket: WebSocket) => {
       }
       if (messageActionInstance) {
         messageActionInstance.execute(roomId, msg, socket, state);
+      }
+      if (indexActionInstance){
+        indexActionInstance.execute(roomId,playerIndex,socket,state)
       }
     } catch (err) {
       console.error("Error processing message:", err);
