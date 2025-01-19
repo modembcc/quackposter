@@ -102,12 +102,14 @@ export class RoomData {
   }
 
   sendQuestion() {
+    const qn: string = this.getQuestion()
+    const isLastRound: boolean = this.isLastRound()
     for (let i = 0; i < this.players.length; i++){
       this.players[i].send(
         JSON.stringify({
           ok: true,
-          isLastRound: this.isLastRound(),
-          question: this.getQuestion(),
+          isLastRound ,
+          question: qn,
           action: "startRound",
         })
       );
