@@ -81,7 +81,7 @@ export class RoomData {
 
   setUpRoom() {
     this.minorityPlayer = this.players[this.minorityIndex];
-    this.players.forEach((player, index) => {
+    this.players.forEach((val, index) => {
       if (index === this.minorityIndex) {
         val.send(
           JSON.stringify({ word: this.minorityWord, action: "sendWord" })
