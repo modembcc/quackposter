@@ -63,7 +63,6 @@ export class RoomData {
   private started: boolean = false;
   private majorityWord: string = generateRandomElem(animals);
   private minorityWord: string = generateRandomElem(animals);
-  private minorityPlayer: WebSocket | null = null;
   private answers: string[] = ["", "", "", ""];
   private questions: string[] = [];
   private minorityIndex: number = Math.floor(Math.random() * 4);
@@ -77,10 +76,14 @@ export class RoomData {
     while (this.majorityWord === this.minorityWord) {
       this.minorityWord = generateRandomElem(animals);
     }
+    this.generateQuestions().then(res => {
+          for (let i = 0; i < this.players.length; i++) {
+              this.players[i].send(JSON.stringify(res))
+          }
+    })
   }
 
   setUpRoom() {
-    this.minorityPlayer = this.players[this.minorityIndex];
     this.players.forEach((val, index) => {
       if (index === this.minorityIndex) {
         val.send(
@@ -133,6 +136,7 @@ export class RoomData {
   }
 
   async generateQuestions() {
+    try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -180,6 +184,12 @@ export class RoomData {
     const result: OpenAIResponse = (await response.json()) as OpenAIResponse;
     const questions = result.choices[0].message.content;
     this.questions = JSON.parse(questions).questions;
+    return {ok: true, msg: "", action: "generateQuestion"}
+
+  } catch (e) {
+      return {ok: false, msg: "internal error", action: "generateQuestion"}
+   }
+
   }
 
   getQuestion(): string {
