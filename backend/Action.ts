@@ -119,6 +119,7 @@ export class GetVoteAction implements Action {
         action: "getAnswer",
       })
     );
+    delete state.id
   }
 }
 
