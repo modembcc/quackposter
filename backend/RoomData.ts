@@ -89,6 +89,9 @@ export class RoomData {
     });
   }
 
+  getVotes() {
+    return this.votes
+  }
   // Add player (WebSocket client) to the room
   add(socket: WebSocket): Response {
     if (this.isFull()) {
@@ -128,7 +131,7 @@ export class RoomData {
           },
           {
             role: "user",
-            content: "cats and dogs",
+            content: `${this.minorityWord} and ${this.majorityWord}`,
           },
         ],
         response_format: {
@@ -178,14 +181,7 @@ export class RoomData {
   isLastRound() {
     return this.round === 2;
   }
-  // Broadcast message to all players in the room
-  // private static broadcastMsg(msg: Record<string,boolean>): void {
-  //   this.players.forEach((client) => {
-  //     if (client.readyState === WebSocket.OPEN) {
-  //       client.send(msg);
-  //     }
-  //   });
-  // }
+  
   getSize(): number {
     return this.size;
   }
@@ -194,11 +190,5 @@ export class RoomData {
     this.votes[index] += 1;
   }
 
-  // getVoteResult(): void {
-  //   let maxnumber: number = -1
-  //   let maxindex:number[] = []
-  //   for (let i = 0; i < 4; i++){
 
-  //   }
-  // }
 }
