@@ -114,7 +114,7 @@ export interface MessageAction {
   ): void;
 }
 
-export class updateAnswerAction implements MessageAction {
+export class UpdateAnswerAction implements MessageAction {
   execute(
     id: string,
     msg: string,
