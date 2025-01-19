@@ -105,6 +105,23 @@ export class getAnswerAction implements Action {
   }
 }
 
+export class GetVoteAction implements Action {
+  execute(
+    id: string,
+    socket: WebSocket,
+    state: { [key: string]: RoomData }
+  ): void {
+    const room: RoomData = state[id];
+    socket.send(
+      JSON.stringify({
+        ok: true,
+        votes: room.getVotes(),
+        action: "getAnswer",
+      })
+    );
+  }
+}
+
 export interface MessageAction {
   execute(
     id: string,
@@ -126,13 +143,13 @@ export class UpdateAnswerAction implements MessageAction {
   }
 }
 
-// export interface IndexAction {
-//   execute(id : number, playerIndex: number, socket: WebSocket, state: { [key: number]: RoomData }): void;
-// }
+export interface IndexAction {
+  execute(id : number, playerIndex: number, socket: WebSocket, state: { [key: number]: RoomData }): void;
+}
 
-// export class voteAction implements IndexAction {
-//   execute(id: number, playerIndex:number, socket: WebSocket, state: { [key: number]: RoomData }): void {
-//     const room:RoomData = state[id]
-//     room.updateVote(playerIndex)
-//   }
-// }
+export class VoteAction implements IndexAction {
+  execute(id: number, playerIndex:number, socket: WebSocket, state: { [key: number]: RoomData }): void {
+    const room:RoomData = state[id]
+    room.updateVote(playerIndex)
+  }
+}
