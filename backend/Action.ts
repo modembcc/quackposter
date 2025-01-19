@@ -77,14 +77,7 @@ export class StartRoundAction implements Action {
     state: { [key: string]: RoomData }
   ): void {
     const room: RoomData = state[id];
-    socket.send(
-      JSON.stringify({
-        ok: true,
-        isLastRound: room.isLastRound(),
-        question: room.getQuestion(),
-        action: "startRound",
-      })
-    );
+    room.sendQuestion()
   }
 }
 

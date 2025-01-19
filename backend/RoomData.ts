@@ -101,6 +101,19 @@ export class RoomData {
     return this.votes;
   }
 
+  sendQuestion() {
+    for (let i = 0; i < this.players.length; i++){
+      this.players[i].send(
+        JSON.stringify({
+          ok: true,
+          isLastRound: this.isLastRound(),
+          question: this.getQuestion(),
+          action: "startRound",
+        })
+      );
+    }
+  }
+
   add(socket: WebSocket): Response {
     if (this.isFull()) {
       return { ok: false, msg: "Room is Full", action: "joinRoom" };
