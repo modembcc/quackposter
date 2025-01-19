@@ -104,7 +104,14 @@ export class RoomData {
       this.started = true;
       this.setUpRoom();
     }
+    this.sendJoinMessage()
     return { ok: true, msg: "Joined Successfully", action: "joinRoom" };
+  }
+
+   private sendJoinMessage() {
+    for (let i = 0; i < this.size - 1; i++) {
+      this.players[i].send(JSON.stringify({msg: "A user has joined", ok: true, action: "joinAlert"}))
+    }
   }
 
   updateAnswer(socket: WebSocket, msg: string) {
