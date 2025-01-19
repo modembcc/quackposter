@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Supports modern JavaScript features
+    "module": "ESNext", // For ES module syntax
+    "moduleResolution": "node", // Resolves Node.js-style modules
+    "lib": ["ES2020"], // Includes modern JavaScript built-ins
+    "types": ["node"], // Includes Node.js type definitions
+    "esModuleInterop": true, // Ensures compatibility with CommonJS modules
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "strict": true
+  },
+  "files": ["server.ts", "RoomData.ts", "Action.ts"]
+}
