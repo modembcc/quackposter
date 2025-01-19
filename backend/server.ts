@@ -6,6 +6,8 @@ import {
   Action,
   StartRoundAction,
   getAnswerAction,
+  UpdateAnswerAction,
+  MessageAction,
 } from "./Action.js";
 import { RoomData } from "./RoomData.js";
 
@@ -35,8 +37,10 @@ wss.on("connection", (socket: WebSocket) => {
     try {
       // Parse the incoming message
       const parsedMessage = JSON.parse(message);
-      const { action, roomId } = parsedMessage;
+      const { action, roomId, msg } = parsedMessage;
       let actionInstance: Action | null = null;
+      let messageActionInstance: MessageAction | null = null;
+
 
       // Handle different actions
       switch (action) {
@@ -55,6 +59,9 @@ wss.on("connection", (socket: WebSocket) => {
         case "startRound":
           actionInstance = new StartRoundAction();
           break;
+        case "updateAnswer":
+          messageActionInstance = new UpdateAnswerAction()
+          break;
 
         default:
           console.log("Unknown action");
@@ -66,6 +73,9 @@ wss.on("connection", (socket: WebSocket) => {
 
       if (actionInstance) {
         actionInstance.execute(roomId, socket, state);
+      }
+      if (messageActionInstance) {
+        messageActionInstance.execute(roomId, msg, socket, state);
       }
     } catch (err) {
       console.error("Error processing message:", err);
