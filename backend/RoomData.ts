@@ -83,9 +83,13 @@ export class RoomData {
     this.minorityPlayer = this.players[this.minorityIndex];
     this.players.forEach((player, index) => {
       if (index === this.minorityIndex) {
-        player.send(this.minorityWord);
+        val.send(
+          JSON.stringify({ word: this.minorityWord, action: "sendWord" })
+        );
       } else {
-        player.send(this.majorityWord);
+        val.send(
+          JSON.stringify({ word: this.majorityWord, action: "sendWord" })
+        );
       }
     });
   }
